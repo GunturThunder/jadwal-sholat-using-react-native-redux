@@ -14,3 +14,13 @@ import {REACT_APP_API} from 'react-native-dotenv'
 //         })
 //     }
 // }
+
+export const getAll = () => {
+    return {
+        type: 'GET_JADWAL',
+        payload: axios({
+            method: "GET",
+            url: process.env.REACT_APP_URL + ''
+        })
+    }
+}
