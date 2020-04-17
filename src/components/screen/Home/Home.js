@@ -95,6 +95,7 @@ const styles = StyleSheet.create({
 
 class Home extends Component {
     state = {
+        day: '',
         date: '',
         month: '',
         year: '',
@@ -102,13 +103,15 @@ class Home extends Component {
         date: '',
         min: '',
         sec: '',
+        showPray: '',
+        showPrayTime: ''
 
     }
     getAll() {
         this.props.dispatch(getAll())
     }
-
-    componentDidMount() {
+    dateCondition() {
+        var day = new Date().getDay();
         var date = new Date().getDate(); //Current Date
         var month = new Date().getMonth() + 1; //Current Month
         var year = new Date().getFullYear(); //Current Year
@@ -116,17 +119,140 @@ class Home extends Component {
         var min = new Date().getMinutes(); //Current Minutes
         var sec = new Date().getSeconds(); //Current Seconds
         this.setState({
+            day: day,
             date: date,
             month: month,
             year: year,
             hours: hours,
             min: min,
             sec: sec,
-          });
+        });
+        // month condition
+        if (month === 1) {
+            this.setState({
+                month: 'Januari'
+            })
+        }
+        else if (month == 2) {
+            this.setState({
+                month: 'Februari'
+            })
+        }
+        else if (month == 3) {
+            this.setState({
+                month: 'Maret'
+            })
+        }
+        else if (month == 4) {
+            this.setState({
+                month: 'April'
+            })
+        }
+        else if (month == 5) {
+            this.setState({
+                month: 'Mei'
+            })
+        }
+        else if (month == 6) {
+            this.setState({
+                month: 'Juni'
+            })
+        }
+        else if (month == 7) {
+            this.setState({
+                month: 'Juli'
+            })
+        }
+        else if (month == 8) {
+            this.setState({
+                month: 'Agustus'
+            })
+        }
+        else if (month == 9) {
+            this.setState({
+                month: 'September'
+            })
+        }
+        else if (month == 10) {
+            this.setState({
+                month: 'Oktober'
+            })
+        }
+        else if (month == 11) {
+            this.setState({
+                month: 'November'
+            })
+        }
+        else if (month == 12) {
+            this.setState({
+                month: 'Desember'
+            })
+        }
+        // day condition
+        if (day == 1) {
+            this.setState({
+                day: 'Senin'
+            })
+        }
+        else if (day == 2) {
+            this.setState({
+                day: 'Selasa'
+            })
+        }
+        else if (day == 3) {
+            this.setState({
+                day: 'Rabu'
+            })
+        }
+        else if (day == 4) {
+            this.setState({
+                day: 'Kamis'
+            })
+        }
+        else if (day == 5) {
+            this.setState({
+                day: `Jum'at`
+            })
+        }
+        else if (day == 6) {
+            this.setState({
+                day: 'Sabtu'
+            })
+        }
+        else if (day == 7) {
+            this.setState({
+                day: 'Ahad'
+            })
+        }
+    }
+    prayTimeCondition(){
+        if(this.state.hours<this.props.jadwal.Dhuhr && this.props.jadwal.Dhuhr>this.state.hours) {
+            this.setState({
+                showPray: 'Subuh',
+                showPrayTime: this.props.jadwal.Fajr
+            })
+        }
+        // console.log(this.state.hours<this.props.jadwal.Dhuhr && this.props.jadwal.Dhuhr>this.state.hours)
+        // else if(this.props.jadwal.Fajr<this.props.jadwal.Dhuhr && this.props.jadwal.Dhuhr>this.props.jadwal.Fajr) {
+        //     this.setState({
+        //         showPray: 'Subuh',
+        //         showPrayTime: this.props.jadwal.Fajr
+        //     })
+        // }
+    }
+    componentDidMount() {
         this.getAll()
+        this.dateCondition()
+        this.prayTimeCondition()
     }
     render() {
         const { jadwal } = this.props
+        // console.log(this.state.showPray,this.state.showPrayTime)
+        // console.log("Sholat ",this.state.showPray,"Jam ",this.state.showPrayTime)
+        // console.log("subuh < duhur dan duhur > subuh",jadwal.Fajr<jadwal.Dhuhr && jadwal.Dhuhr>jadwal.Fajr)
+        // console.log("zuhur < asar",jadwal.Dhuhr<jadwal.Asr)
+        // console.log("asar < magrib",jadwal.Asr<jadwal.Maghrib)
+        // console.log("magrib < isya",jadwal.Maghrib<jadwal.Isha)
         return (
             <View style={styles.wrap}>
                 <StatusBar backgroundColor="#5B0C9F" barStyle="light-content" />
@@ -135,7 +261,7 @@ class Home extends Component {
                     <View style={styles.wrapDate}>
                         <View style={styles.date}>
                             <Text style={styles.dateText1}>Hari ini</Text>
-                            <Text style={styles.dateText2}>Jum'at, {this.state.date} - {this.state.month} - {this.state.year}</Text>
+                            <Text style={styles.dateText2}>{this.state.day}, {this.state.date} - {this.state.month} - {this.state.year}</Text>
                         </View>
                     </View>
                     <View style={styles.menuWrap}>
@@ -149,7 +275,7 @@ class Home extends Component {
                             </TouchableOpacity>
                         </View>
                         <View style={styles.information}>
-                            <Text style={styles.informationTimes}>Dzhuhur {jadwal.Dhuhr}</Text>
+                            <Text style={styles.informationTimes}>Maghrib {jadwal.Maghrib}</Text>
                             <Text style={styles.informationPray}>2 Jam 25 Menit Lagi</Text>
                         </View>
                     </View>
@@ -166,7 +292,7 @@ class Home extends Component {
                             </View>
                         </View>
                         <View style={styles.wrapScheduleDetail}>
-                            <Text style={styles.wrapScheduleDetailText}>Dzhuhur</Text>
+                            <Text style={styles.wrapScheduleDetailText}>Dzuhur</Text>
                             <View style={styles.wrapScheduleDetail1}>
                                 <Text style={styles.wrapScheduleDetailText}>{jadwal.Dhuhr}</Text>
                                 <TouchableOpacity>
@@ -209,7 +335,6 @@ class Home extends Component {
 }
 
 const mapStateToProps = (state) => {
-    // console.log('home ',state.jadwal.dayJadwal)
     return {
         jadwal: state.jadwal.dayJadwal
     }
