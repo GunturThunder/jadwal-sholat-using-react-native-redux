@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux';
 
-import products from './product';
+import jadwal from './jadwal';
 
 export default combineReducers({
-    products
+    jadwal
 });

@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 import { View, Text, StyleSheet, Image, StatusBar, TouchableOpacity } from 'react-native'
 import bg from '../../../bg.png'
 import Icon from 'react-native-vector-icons/Ionicons';
+import { connect } from 'react-redux';
+import { getAll } from '../../redux/action/jadwal'
 
 const styles = StyleSheet.create({
     wrap: {
@@ -78,7 +80,7 @@ const styles = StyleSheet.create({
     },
     wrapScheduleDetail1: {
         flexDirection: 'row',
-        width: '40%',
+        width: '35%',
         justifyContent: 'space-between'
     },
     wrapScheduleDetailText: {
@@ -92,7 +94,39 @@ const styles = StyleSheet.create({
 })
 
 class Home extends Component {
+    state = {
+        date: '',
+        month: '',
+        year: '',
+        hours: '',
+        date: '',
+        min: '',
+        sec: '',
+
+    }
+    getAll() {
+        this.props.dispatch(getAll())
+    }
+
+    componentDidMount() {
+        var date = new Date().getDate(); //Current Date
+        var month = new Date().getMonth() + 1; //Current Month
+        var year = new Date().getFullYear(); //Current Year
+        var hours = new Date().getHours(); //Current Hours
+        var min = new Date().getMinutes(); //Current Minutes
+        var sec = new Date().getSeconds(); //Current Seconds
+        this.setState({
+            date: date,
+            month: month,
+            year: year,
+            hours: hours,
+            min: min,
+            sec: sec,
+          });
+        this.getAll()
+    }
     render() {
+        const { jadwal } = this.props
         return (
             <View style={styles.wrap}>
                 <StatusBar backgroundColor="#5B0C9F" barStyle="light-content" />
@@ -101,7 +135,7 @@ class Home extends Component {
                     <View style={styles.wrapDate}>
                         <View style={styles.date}>
                             <Text style={styles.dateText1}>Hari ini</Text>
-                            <Text style={styles.dateText2}>Jum'at, 30 Juni 2020</Text>
+                            <Text style={styles.dateText2}>Jum'at, {this.state.date} - {this.state.month} - {this.state.year}</Text>
                         </View>
                     </View>
                     <View style={styles.menuWrap}>
@@ -115,7 +149,7 @@ class Home extends Component {
                             </TouchableOpacity>
                         </View>
                         <View style={styles.information}>
-                            <Text style={styles.informationTimes}>Isya 07:06</Text>
+                            <Text style={styles.informationTimes}>Dzhuhur {jadwal.Dhuhr}</Text>
                             <Text style={styles.informationPray}>2 Jam 25 Menit Lagi</Text>
                         </View>
                     </View>
@@ -125,7 +159,7 @@ class Home extends Component {
                         <View style={styles.wrapScheduleDetail}>
                             <Text style={styles.wrapScheduleDetailText}>Subuh</Text>
                             <View style={styles.wrapScheduleDetail1}>
-                                <Text style={styles.wrapScheduleDetailText}>04.43 AM</Text>
+                                <Text style={styles.wrapScheduleDetailText}>{jadwal.Fajr}</Text>
                                 <TouchableOpacity>
                                     <Icon style={styles.wrapScheduleDetailIcon} name="md-notifications" />
                                 </TouchableOpacity>
@@ -134,7 +168,7 @@ class Home extends Component {
                         <View style={styles.wrapScheduleDetail}>
                             <Text style={styles.wrapScheduleDetailText}>Dzhuhur</Text>
                             <View style={styles.wrapScheduleDetail1}>
-                                <Text style={styles.wrapScheduleDetailText}>04.43 AM</Text>
+                                <Text style={styles.wrapScheduleDetailText}>{jadwal.Dhuhr}</Text>
                                 <TouchableOpacity>
                                     <Icon style={styles.wrapScheduleDetailIcon} name="md-notifications" />
                                 </TouchableOpacity>
@@ -143,7 +177,7 @@ class Home extends Component {
                         <View style={styles.wrapScheduleDetail}>
                             <Text style={styles.wrapScheduleDetailText}>Asar</Text>
                             <View style={styles.wrapScheduleDetail1}>
-                                <Text style={styles.wrapScheduleDetailText}>04.43 AM</Text>
+                                <Text style={styles.wrapScheduleDetailText}>{jadwal.Asr}</Text>
                                 <TouchableOpacity>
                                     <Icon style={styles.wrapScheduleDetailIcon} name="md-notifications" />
                                 </TouchableOpacity>
@@ -152,16 +186,16 @@ class Home extends Component {
                         <View style={styles.wrapScheduleDetail}>
                             <Text style={styles.wrapScheduleDetailText}>Magrib</Text>
                             <View style={styles.wrapScheduleDetail1}>
-                                <Text style={styles.wrapScheduleDetailText}>04.43 AM</Text>
+                                <Text style={styles.wrapScheduleDetailText}>{jadwal.Maghrib}</Text>
                                 <TouchableOpacity>
                                     <Icon style={styles.wrapScheduleDetailIcon} name="md-notifications" />
                                 </TouchableOpacity>
                             </View>
                         </View>
                         <View style={styles.wrapScheduleDetail}>
-                            <Text style={styles.wrapScheduleDetailText}>'Isya'</Text>
+                            <Text style={styles.wrapScheduleDetailText}>'Isya</Text>
                             <View style={styles.wrapScheduleDetail1}>
-                                <Text style={styles.wrapScheduleDetailText}>04.43 AM</Text>
+                                <Text style={styles.wrapScheduleDetailText}>{jadwal.Isha}</Text>
                                 <TouchableOpacity>
                                     <Icon style={styles.wrapScheduleDetailIcon} name="md-notifications" />
                                 </TouchableOpacity>
@@ -173,4 +207,12 @@ class Home extends Component {
         )
     }
 }
-export default Home
+
+const mapStateToProps = (state) => {
+    // console.log('home ',state.jadwal.dayJadwal)
+    return {
+        jadwal: state.jadwal.dayJadwal
+    }
+}
+
+export default connect(mapStateToProps)(Home)
