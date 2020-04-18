@@ -104,13 +104,16 @@ class Home extends Component {
         min: '',
         sec: '',
         showPray: '',
-        showPrayTime: ''
+        showPrayTime: '',
+        timeNow:''
 
     }
-    getAll() {
-        this.props.dispatch(getAll())
+    async getAll() {
+        await this.props.dispatch(getAll())
+        await this.dateCondition()
+        this.prayTimeCondition()
     }
-    dateCondition() {
+    async dateCondition() {
         var day = new Date().getDay();
         var date = new Date().getDate(); //Current Date
         var month = new Date().getMonth() + 1; //Current Month
@@ -126,8 +129,9 @@ class Home extends Component {
             hours: hours,
             min: min,
             sec: sec,
+            timeNow:`${hours}:${min}`
         });
-        // month condition
+        
         if (month === 1) {
             this.setState({
                 month: 'Januari'
@@ -226,33 +230,44 @@ class Home extends Component {
         }
     }
     prayTimeCondition(){
-        if(this.state.hours<this.props.jadwal.Dhuhr && this.props.jadwal.Dhuhr>this.state.hours) {
+        if(this.state.timeNow<this.props.jadwal.Fajr && this.state.timeNow<this.props.jadwal.Dhuhr) {
             this.setState({
-                showPray: 'Subuh',
-                showPrayTime: this.props.jadwal.Fajr
+                showPray:'Subuh',
+                showPrayTime:this.props.jadwal.Fajr
             })
         }
-        // console.log(this.state.hours<this.props.jadwal.Dhuhr && this.props.jadwal.Dhuhr>this.state.hours)
-        // else if(this.props.jadwal.Fajr<this.props.jadwal.Dhuhr && this.props.jadwal.Dhuhr>this.props.jadwal.Fajr) {
-        //     this.setState({
-        //         showPray: 'Subuh',
-        //         showPrayTime: this.props.jadwal.Fajr
-        //     })
-        // }
+        else if(this.state.timeNow<this.props.jadwal.Dhuhr && this.state.timeNow<this.props.jadwal.Asr) {
+            this.setState({
+                showPray:'Dzuhur',
+                showPrayTime:this.props.jadwal.Dhuhr
+            })
+        }
+        else if(this.state.timeNow<this.props.jadwal.Asr && this.state.timeNow<this.props.jadwal.Maghrib) {
+            this.setState({
+                showPray:'Asar',
+                showPrayTime:this.props.jadwal.Asr
+            })
+        }
+        else if(this.state.timeNow<this.props.jadwal.Maghrib && this.state.timeNow<this.props.jadwal.Isha) {
+            this.setState({
+                showPray:'Magrib',
+                showPrayTime:jadwal.Maghrib
+            })
+        }
+        else if(this.state.timeNow<this.props.jadwal.Isha && this.state.timeNow<this.props.jadwal.Fajr) {
+            this.setState({
+                showPray:`'Isya`,
+                showPrayTime:this.props.jadwal.Isha
+            })
+        }
+
     }
-    componentDidMount() {
+    async componentDidMount() {
         this.getAll()
-        this.dateCondition()
-        this.prayTimeCondition()
     }
     render() {
         const { jadwal } = this.props
-        // console.log(this.state.showPray,this.state.showPrayTime)
-        // console.log("Sholat ",this.state.showPray,"Jam ",this.state.showPrayTime)
-        // console.log("subuh < duhur dan duhur > subuh",jadwal.Fajr<jadwal.Dhuhr && jadwal.Dhuhr>jadwal.Fajr)
-        // console.log("zuhur < asar",jadwal.Dhuhr<jadwal.Asr)
-        // console.log("asar < magrib",jadwal.Asr<jadwal.Maghrib)
-        // console.log("magrib < isya",jadwal.Maghrib<jadwal.Isha)
+        // console.log("ShowPray ",this.state.showPray," Time ",this.state.showPrayTime)
         return (
             <View style={styles.wrap}>
                 <StatusBar backgroundColor="#5B0C9F" barStyle="light-content" />
@@ -275,7 +290,7 @@ class Home extends Component {
                             </TouchableOpacity>
                         </View>
                         <View style={styles.information}>
-                            <Text style={styles.informationTimes}>Maghrib {jadwal.Maghrib}</Text>
+                            <Text style={styles.informationTimes}>{this.state.showPray} {this.state.showPrayTime}</Text>
                             <Text style={styles.informationPray}>2 Jam 25 Menit Lagi</Text>
                         </View>
                     </View>
