@@ -105,13 +105,15 @@ class Home extends Component {
         sec: '',
         showPray: '',
         showPrayTime: '',
-        timeNow:''
-
+        timeNow:'',
+        prayTimeHour:'',
+        prayTimeMin:''
     }
     async getAll() {
         await this.props.dispatch(getAll())
         await this.dateCondition()
         this.prayTimeCondition()
+        this.countDownCondition()
     }
     async dateCondition() {
         var day = new Date().getDay();
@@ -131,7 +133,7 @@ class Home extends Component {
             sec: sec,
             timeNow:`${hours}:${min}`
         });
-        
+
         if (month === 1) {
             this.setState({
                 month: 'Januari'
@@ -262,12 +264,29 @@ class Home extends Component {
         }
 
     }
+    countDownCondition() {
+        const prayTimeHourNow = (this.state.showPrayTime).substring(0, 2)
+        const prayTimeMinNow = (this.state.showPrayTime).substring(3, 5)
+        // console.log(parseInt(prayTimeMinNow))
+        // console.log(parseInt(prayTimeHourNow))
+
+        const Timenow = (((this.state.hours)*60)+this.state.min)
+        const prayTime = (((parseInt(prayTimeHourNow))*60)+parseInt(prayTimeMinNow))
+        const prayTimeResultHour = parseInt((prayTime - Timenow)/60)
+        const prayTimeResultMin = (prayTime - Timenow)%30
+        // console.log(prayTimeResultHour," jam ",prayTimeResultMin, " lagi")
+        this.setState({
+            prayTimeHour: prayTimeResultHour,
+            prayTimeMin: prayTimeResultMin
+        })
+    }
     async componentDidMount() {
         this.getAll()
     }
     render() {
         const { jadwal } = this.props
         // console.log("ShowPray ",this.state.showPray," Time ",this.state.showPrayTime)
+        console.log(this.state.prayTimeHour)
         return (
             <View style={styles.wrap}>
                 <StatusBar backgroundColor="#5B0C9F" barStyle="light-content" />
@@ -291,7 +310,7 @@ class Home extends Component {
                         </View>
                         <View style={styles.information}>
                             <Text style={styles.informationTimes}>{this.state.showPray} {this.state.showPrayTime}</Text>
-                            <Text style={styles.informationPray}>2 Jam 25 Menit Lagi</Text>
+                            <Text style={styles.informationPray}>{this.state.prayTimeHour} Jam {this.state.prayTimeMin} Menit Lagi</Text>
                         </View>
                     </View>
                 </View>
