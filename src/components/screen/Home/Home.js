@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { View, Text, StyleSheet, Image, StatusBar, TouchableOpacity } from 'react-native'
+import AsyncStorage from '@react-native-community/async-storage';
 import bg from '../../../bg.png'
 import Icon from 'react-native-vector-icons/Ionicons';
 import { connect } from 'react-redux';
@@ -105,9 +106,14 @@ class Home extends Component {
         sec: '',
         showPray: '',
         showPrayTime: '',
-        timeNow:'',
-        prayTimeHour:'',
-        prayTimeMin:''
+        timeNow: '',
+        prayTimeHour: '',
+        prayTimeMin: '',
+        iconSubuh: "md-notifications",
+        iconDzuhur: "md-notifications",
+        iconAsar: "md-notifications",
+        iconMagrib: "md-notifications",
+        iconIsya: "md-notifications"
     }
     async getAll() {
         await this.props.dispatch(getAll())
@@ -131,7 +137,7 @@ class Home extends Component {
             hours: hours,
             min: min,
             sec: sec,
-            timeNow:`${hours}:${min}`
+            timeNow: `${hours}:${min}`
         });
 
         if (month === 1) {
@@ -231,35 +237,41 @@ class Home extends Component {
             })
         }
     }
-    prayTimeCondition(){
-        if(this.state.timeNow<this.props.jadwal.Fajr && this.state.timeNow<this.props.jadwal.Dhuhr) {
+    prayTimeCondition() {
+        if (this.state.timeNow < this.props.jadwal.Fajr && this.state.timeNow < this.props.jadwal.Dhuhr) {
             this.setState({
-                showPray:'Subuh',
-                showPrayTime:this.props.jadwal.Fajr
+                showPray: 'Subuh',
+                showPrayTime: this.props.jadwal.Fajr
             })
         }
-        else if(this.state.timeNow<this.props.jadwal.Dhuhr && this.state.timeNow<this.props.jadwal.Asr) {
+        else if (this.state.timeNow < this.props.jadwal.Dhuhr && this.state.timeNow < this.props.jadwal.Asr) {
             this.setState({
-                showPray:'Dzuhur',
-                showPrayTime:this.props.jadwal.Dhuhr
+                showPray: 'Dzuhur',
+                showPrayTime: this.props.jadwal.Dhuhr
             })
         }
-        else if(this.state.timeNow<this.props.jadwal.Asr && this.state.timeNow<this.props.jadwal.Maghrib) {
+        else if (this.state.timeNow < this.props.jadwal.Asr && this.state.timeNow < this.props.jadwal.Maghrib) {
             this.setState({
-                showPray:'Asar',
-                showPrayTime:this.props.jadwal.Asr
+                showPray: 'Asar',
+                showPrayTime: this.props.jadwal.Asr
             })
         }
-        else if(this.state.timeNow<this.props.jadwal.Maghrib && this.state.timeNow<this.props.jadwal.Isha) {
+        else if (this.state.timeNow < this.props.jadwal.Maghrib && this.state.timeNow < this.props.jadwal.Isha) {
             this.setState({
-                showPray:'Magrib',
-                showPrayTime:jadwal.Maghrib
+                showPray: 'Magrib',
+                showPrayTime: this.props.jadwal.Maghrib
             })
         }
-        else if(this.state.timeNow<this.props.jadwal.Isha && this.state.timeNow<this.props.jadwal.Fajr) {
+        else if (this.state.timeNow < this.props.jadwal.Isha && this.state.timeNow < this.props.jadwal.Fajr) {
             this.setState({
-                showPray:`'Isya`,
-                showPrayTime:this.props.jadwal.Isha
+                showPray: `'Isya`,
+                showPrayTime: this.props.jadwal.Isha
+            })
+        }
+        else {
+            this.setState({
+                showPray: 'Subuh',
+                showPrayTime: this.props.jadwal.Fajr
             })
         }
 
@@ -267,26 +279,30 @@ class Home extends Component {
     countDownCondition() {
         const prayTimeHourNow = (this.state.showPrayTime).substring(0, 2)
         const prayTimeMinNow = (this.state.showPrayTime).substring(3, 5)
-        // console.log(parseInt(prayTimeMinNow))
-        // console.log(parseInt(prayTimeHourNow))
-
-        const Timenow = (((this.state.hours)*60)+this.state.min)
-        const prayTime = (((parseInt(prayTimeHourNow))*60)+parseInt(prayTimeMinNow))
-        const prayTimeResultHour = parseInt((prayTime - Timenow)/60)
-        const prayTimeResultMin = (prayTime - Timenow)%30
-        // console.log(prayTimeResultHour," jam ",prayTimeResultMin, " lagi")
-        this.setState({
-            prayTimeHour: prayTimeResultHour,
-            prayTimeMin: prayTimeResultMin
-        })
+        const Timenow = (((this.state.hours) * 60) + this.state.min)
+        const prayTime = (((parseInt(prayTimeHourNow)) * 60) + parseInt(prayTimeMinNow))
+        const prayTimeResultHour = (parseInt((prayTime - Timenow) / 60))
+        const prayTimeResultMin = ((prayTime - Timenow) % 60)
+        // console.log("gede",prayTime," - "," sekarang ",Timenow)
+        if (this.state.timeNow > this.props.jadwal.Isha) {
+            this.setState({
+                prayTimeHour: prayTimeResultHour+(23),
+                prayTimeMin: prayTimeResultMin+60             
+            })
+        }
+        else{
+            this.setState({
+                prayTimeHour: prayTimeResultHour,
+                prayTimeMin: prayTimeResultMin
+            })
+        }
     }
     async componentDidMount() {
         this.getAll()
     }
     render() {
         const { jadwal } = this.props
-        // console.log("ShowPray ",this.state.showPray," Time ",this.state.showPrayTime)
-        console.log(this.state.prayTimeHour)
+        // console.log("jam sekarang ",this.state.timeNow," jam subuh",this.state.showPrayTime)
         return (
             <View style={styles.wrap}>
                 <StatusBar backgroundColor="#5B0C9F" barStyle="light-content" />
@@ -320,8 +336,8 @@ class Home extends Component {
                             <Text style={styles.wrapScheduleDetailText}>Subuh</Text>
                             <View style={styles.wrapScheduleDetail1}>
                                 <Text style={styles.wrapScheduleDetailText}>{jadwal.Fajr}</Text>
-                                <TouchableOpacity>
-                                    <Icon style={styles.wrapScheduleDetailIcon} name="md-notifications" />
+                                <TouchableOpacity onPress={() => this.setState({ iconSubuh: this.state.iconSubuh == "md-notifications" ? "md-notifications-off" : "md-notifications" })}>
+                                    <Icon style={styles.wrapScheduleDetailIcon} name={this.state.iconSubuh} />
                                 </TouchableOpacity>
                             </View>
                         </View>
@@ -329,8 +345,8 @@ class Home extends Component {
                             <Text style={styles.wrapScheduleDetailText}>Dzuhur</Text>
                             <View style={styles.wrapScheduleDetail1}>
                                 <Text style={styles.wrapScheduleDetailText}>{jadwal.Dhuhr}</Text>
-                                <TouchableOpacity>
-                                    <Icon style={styles.wrapScheduleDetailIcon} name="md-notifications" />
+                                <TouchableOpacity onPress={() => this.setState({ iconDzuhur: this.state.iconDzuhur == "md-notifications" ? "md-notifications-off" : "md-notifications" })}>
+                                    <Icon style={styles.wrapScheduleDetailIcon} name={this.state.iconDzuhur} />
                                 </TouchableOpacity>
                             </View>
                         </View>
@@ -338,8 +354,8 @@ class Home extends Component {
                             <Text style={styles.wrapScheduleDetailText}>Asar</Text>
                             <View style={styles.wrapScheduleDetail1}>
                                 <Text style={styles.wrapScheduleDetailText}>{jadwal.Asr}</Text>
-                                <TouchableOpacity>
-                                    <Icon style={styles.wrapScheduleDetailIcon} name="md-notifications" />
+                                <TouchableOpacity onPress={() => this.setState({ iconAsar: this.state.iconAsar == "md-notifications" ? "md-notifications-off" : "md-notifications" })}>
+                                    <Icon style={styles.wrapScheduleDetailIcon} name={this.state.iconAsar} />
                                 </TouchableOpacity>
                             </View>
                         </View>
@@ -347,8 +363,8 @@ class Home extends Component {
                             <Text style={styles.wrapScheduleDetailText}>Magrib</Text>
                             <View style={styles.wrapScheduleDetail1}>
                                 <Text style={styles.wrapScheduleDetailText}>{jadwal.Maghrib}</Text>
-                                <TouchableOpacity>
-                                    <Icon style={styles.wrapScheduleDetailIcon} name="md-notifications" />
+                                <TouchableOpacity onPress={() => this.setState({ iconMagrib: this.state.iconMagrib == "md-notifications" ? "md-notifications-off" : "md-notifications" })}>
+                                    <Icon style={styles.wrapScheduleDetailIcon} name={this.state.iconMagrib} />
                                 </TouchableOpacity>
                             </View>
                         </View>
@@ -356,8 +372,8 @@ class Home extends Component {
                             <Text style={styles.wrapScheduleDetailText}>'Isya</Text>
                             <View style={styles.wrapScheduleDetail1}>
                                 <Text style={styles.wrapScheduleDetailText}>{jadwal.Isha}</Text>
-                                <TouchableOpacity>
-                                    <Icon style={styles.wrapScheduleDetailIcon} name="md-notifications" />
+                                <TouchableOpacity onPress={() => this.setState({ iconIsya: this.state.iconIsya == "md-notifications" ? "md-notifications-off" : "md-notifications" })}>
+                                    <Icon style={styles.wrapScheduleDetailIcon} name={this.state.iconIsya} />
                                 </TouchableOpacity>
                             </View>
                         </View>
