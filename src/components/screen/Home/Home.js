@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { View, Text, StyleSheet, Image, StatusBar, TouchableOpacity } from 'react-native'
 import AsyncStorage from '@react-native-community/async-storage';
 import bg from '../../../bg.png'
+import publicIP from 'react-native-public-ip';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { connect } from 'react-redux';
 import { getAll } from '../../redux/action/jadwal'
@@ -104,6 +105,7 @@ class Home extends Component {
         date: '',
         min: '',
         sec: '',
+        fullDate: '',
         showPray: '',
         showPrayTime: '',
         timeNow: '',
@@ -113,11 +115,13 @@ class Home extends Component {
         iconDzuhur: "md-notifications",
         iconAsar: "md-notifications",
         iconMagrib: "md-notifications",
-        iconIsya: "md-notifications"
+        iconIsya: "md-notifications",
+        ipPublic:''
     }
     async getAll() {
-        await this.props.dispatch(getAll())
+        await this.getIp()
         await this.dateCondition()
+        await this.props.dispatch(getAll(this.state.fullDate, this.state.ipPublic))
         this.prayTimeCondition()
         this.countDownCondition()
     }
@@ -129,6 +133,12 @@ class Home extends Component {
         var hours = new Date().getHours(); //Current Hours
         var min = new Date().getMinutes(); //Current Minutes
         var sec = new Date().getSeconds(); //Current Seconds
+        if ((month.toString().length) < 2) {
+            month = '0' + month
+        }
+        else {
+            month = month
+        }
         this.setState({
             day: day,
             date: date,
@@ -137,7 +147,8 @@ class Home extends Component {
             hours: hours,
             min: min,
             sec: sec,
-            timeNow: `${hours}:${min}`
+            timeNow: `${hours}:${min}`,
+            fullDate: `${year}-${month}-${date}`
         });
 
         if (month === 1) {
@@ -231,7 +242,7 @@ class Home extends Component {
                 day: 'Sabtu'
             })
         }
-        else if (day == 7) {
+        else if (day == 0) {
             this.setState({
                 day: 'Ahad'
             })
@@ -286,23 +297,35 @@ class Home extends Component {
         // console.log("gede",prayTime," - "," sekarang ",Timenow)
         if (this.state.timeNow > this.props.jadwal.Isha) {
             this.setState({
-                prayTimeHour: prayTimeResultHour+(23),
-                prayTimeMin: prayTimeResultMin+60             
+                prayTimeHour: prayTimeResultHour + (23),
+                prayTimeMin: prayTimeResultMin + 60
             })
         }
-        else{
+        else {
             this.setState({
                 prayTimeHour: prayTimeResultHour,
                 prayTimeMin: prayTimeResultMin
             })
         }
     }
+    async getIp() {
+        await publicIP()
+            .then(ip => {
+                console.log(ip)
+                this.setState({
+                    ipPublic:ip
+                })
+            })
+            .catch(error => {
+                console.log(error);
+                // 'Unable to get IP address.'
+            });
+    }
     async componentDidMount() {
         this.getAll()
     }
     render() {
         const { jadwal } = this.props
-        // console.log("jam sekarang ",this.state.timeNow," jam subuh",this.state.showPrayTime)
         return (
             <View style={styles.wrap}>
                 <StatusBar backgroundColor="#5B0C9F" barStyle="light-content" />
@@ -311,7 +334,7 @@ class Home extends Component {
                     <View style={styles.wrapDate}>
                         <View style={styles.date}>
                             <Text style={styles.dateText1}>Hari ini</Text>
-                            <Text style={styles.dateText2}>{this.state.day}, {this.state.date} - {this.state.month} - {this.state.year}</Text>
+                            <Text style={styles.dateText2}>{this.state.day}, {this.state.date}-{this.state.month}-{this.state.year}</Text>
                         </View>
                     </View>
                     <View style={styles.menuWrap}>

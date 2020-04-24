@@ -1,12 +1,11 @@
 import axios from 'axios';
-// import {REACT_APP_API} from 'react-native-dotenv'
 
-export const getAll = () => {
+export const getAll = (data,ip) => {
     return {
         type: 'GET_JADWAL',
         payload: axios({
             method: "GET",
-            url: 'https://api.pray.zone/v2/times/day.json?city=bogor&date=2020-04-17'
+            url: `https://api.pray.zone/v2/times/day.json?ip=${ip}&date=${data}`
         })
     }
 }
