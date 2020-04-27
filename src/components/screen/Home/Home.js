@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, Text, StyleSheet, Image, StatusBar, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, Image, StatusBar, TouchableOpacity, Modal, ActivityIndicator } from 'react-native'
 import AsyncStorage from '@react-native-community/async-storage';
 import bg from '../../../bg.png'
 import publicIP from 'react-native-public-ip';
@@ -116,7 +116,7 @@ class Home extends Component {
         iconAsar: "md-notifications",
         iconMagrib: "md-notifications",
         iconIsya: "md-notifications",
-        ipPublic:''
+        ipPublic: ''
     }
     async getAll() {
         await this.getIp()
@@ -313,7 +313,7 @@ class Home extends Component {
             .then(ip => {
                 console.log(ip)
                 this.setState({
-                    ipPublic:ip
+                    ipPublic: ip
                 })
             })
             .catch(error => {
@@ -325,10 +325,16 @@ class Home extends Component {
         this.getAll()
     }
     render() {
-        const { jadwal } = this.props
+        const { jadwal, isLoading } = this.props
+        console.log(isLoading)
         return (
             <View style={styles.wrap}>
                 <StatusBar backgroundColor="#5B0C9F" barStyle="light-content" />
+                <Modal visible={isLoading} transparent={true} >
+                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                        <ActivityIndicator size="large" color="#0000ff" />
+                    </View>
+                </Modal>
                 <View style={styles.content1}>
                     <Image style={styles.imageBg} source={bg} resizeMode="contain" />
                     <View style={styles.wrapDate}>
@@ -408,8 +414,10 @@ class Home extends Component {
 }
 
 const mapStateToProps = (state) => {
+    console.log(state)
     return {
-        jadwal: state.jadwal.dayJadwal
+        jadwal: state.jadwal.dayJadwal,
+        isLoading: state.jadwal.isLoading
     }
 }
 

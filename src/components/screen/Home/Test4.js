@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { View, Text } from 'react-native'
 import PushNotification from 'react-native-push-notification'
 
-class Test extends Component {
+class Test4 extends Component {
     constructor() {
         super();
         PushNotification.configure({
@@ -32,10 +32,10 @@ class Test extends Component {
     render() {
         return (
             <View>
-                <Text>Test0</Text>
+                <Text>Test4</Text>
             </View>
         )
     }
 }
 
-export default Test
+export default Test4

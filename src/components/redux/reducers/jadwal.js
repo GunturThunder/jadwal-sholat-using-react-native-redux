@@ -1,5 +1,6 @@
 const initialState = {
-    dayJadwal: []
+    dayJadwal: [],
+    isLoading:true
 }
 
 const jadwal = (state = initialState, action) => {
@@ -16,7 +17,8 @@ const jadwal = (state = initialState, action) => {
             // console.log('action.payload.data.results.datetime',action.payload.data.results.datetime[0].times)
             return {
                 ...state,
-                   dayJadwal: action.payload.data.results.datetime[0].times
+                   dayJadwal: action.payload.data.results.datetime[0].times,
+                   isLoading:false
             }
         default:
             return state;
